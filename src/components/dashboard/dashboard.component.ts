@@ -3,15 +3,19 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
+import { TaskReminderService } from '../../services/task-reminder.service';
+import { NotificationComponent } from '../notification/notification.component';
 import { Task } from '../../models/task.model';
 import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NotificationComponent],
   template: `
     <div class="dashboard-container">
+      <app-notification></app-notification>
+      
       <nav class="navbar">
         <div class="container">
           <div class="nav-content">
@@ -95,6 +99,13 @@ import { User } from '../../models/user.model';
                       Mark Complete
                     </button>
                     <button 
+                      class="btn-sm btn-info" 
+                      (click)="editTask(task.id!)"
+                      [disabled]="isLoading"
+                    >
+                      Edit
+                    </button>
+                    <button 
                       class="btn-sm btn-danger" 
                       (click)="deleteTask(task.id!)"
                       [disabled]="isLoading"
@@ -175,7 +186,27 @@ import { User } from '../../models/user.model';
   styles: [`
     .dashboard-container {
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-container::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="30" r="0.5" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="4s" repeatCount="indefinite"/></circle><circle cx="40" cy="60" r="0.8" fill="white" opacity="0.7"><animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="70" cy="80" r="0.6" fill="white" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="3.5s" repeatCount="indefinite"/></circle><circle cx="10" cy="70" r="0.4" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/></circle><circle cx="90" cy="10" r="0.7" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.8s" repeatCount="indefinite"/></circle><circle cx="30" cy="90" r="0.5" fill="white" opacity="0.7"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3.2s" repeatCount="indefinite"/></circle><circle cx="60" cy="40" r="0.6" fill="white" opacity="0.5"><animate attributeName="opacity" values="0.5;0.3;0.5" dur="2.7s" repeatCount="indefinite"/></circle></svg>') repeat;
+      pointer-events: none;
+      z-index: 1;
+      animation: twinkle 10s linear infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
     }
 
     .nav-content {
@@ -185,7 +216,7 @@ import { User } from '../../models/user.model';
     }
 
     .welcome-text {
-      color: #495057;
+      color: #b0b0b0;
       font-weight: 500;
       margin-right: 20px;
     }
@@ -196,6 +227,8 @@ import { User } from '../../models/user.model';
       align-items: center;
       margin: 30px 0;
       padding: 0 20px;
+      position: relative;
+      z-index: 10;
     }
 
     .dashboard-title {
@@ -210,18 +243,22 @@ import { User } from '../../models/user.model';
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
+      position: relative;
+      z-index: 10;
     }
 
     .pending-color {
-      color: #ffc107 !important;
+      color: #ffd43b !important;
     }
 
     .completed-color {
-      color: #28a745 !important;
+      color: #51cf66 !important;
     }
 
     .tasks-section {
       margin-top: 30px;
+      position: relative;
+      z-index: 10;
     }
 
     .tasks-container {
@@ -231,11 +268,12 @@ import { User } from '../../models/user.model';
     }
 
     .tasks-column {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(30, 30, 45, 0.95);
       border-radius: 15px;
       padding: 25px;
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     .column-header {
@@ -255,12 +293,13 @@ import { User } from '../../models/user.model';
     }
 
     .task-count {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(100, 255, 218, 0.2);
       color: white;
       padding: 5px 12px;
       border-radius: 20px;
       font-weight: 600;
       font-size: 14px;
+      border: 1px solid rgba(100, 255, 218, 0.3);
     }
 
     .tasks-list {
@@ -274,12 +313,12 @@ import { User } from '../../models/user.model';
     }
 
     .tasks-list::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 10px;
     }
 
     .tasks-list::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(100, 255, 218, 0.3);
       border-radius: 10px;
     }
 
@@ -300,14 +339,14 @@ import { User } from '../../models/user.model';
     .task-title {
       font-size: 16px;
       font-weight: 600;
-      color: #333;
+      color: #fff;
       margin: 0;
       flex: 1;
       margin-right: 10px;
     }
 
     .task-description {
-      color: #666;
+      color: #b0b0b0;
       margin: 10px 0;
       line-height: 1.5;
     }
@@ -322,12 +361,12 @@ import { User } from '../../models/user.model';
     }
 
     .task-date {
-      color: #ffc107;
+      color: #ffd43b;
       font-weight: 500;
     }
 
     .task-created, .task-completed {
-      color: #999;
+      color: #888;
     }
 
     .loading-overlay {
@@ -352,7 +391,7 @@ import { User } from '../../models/user.model';
   font-size: 15px;
   font-weight: 600;
   color: #ffffff;
-  background: linear-gradient(145deg, #2f74f7, #2364d2); /* Beveled gradient */
+  background: linear-gradient(145deg, #64ffda, #00bcd4); /* Beveled gradient */
   border: none;
   border-radius: 30px; /* Bevel round rectangle */
   box-shadow:
@@ -361,6 +400,7 @@ import { User } from '../../models/user.model';
     0 4px 10px rgba(0, 0, 0, 0.15); /* 3D bevel + base shadow */
   cursor: pointer;
   transition: all 0.3s ease;
+  color: #1a1a2e;
 }
 
 .create-task-btn:hover {
@@ -369,7 +409,7 @@ import { User } from '../../models/user.model';
     inset 1px 1px 2px rgba(255, 255, 255, 0.1),
     inset -1px -1px 2px rgba(0, 0, 0, 0.05),
     0 6px 16px rgba(0, 0, 0, 0.25); /* Elevated shadow on hover */
-  background: linear-gradient(145deg, #3b82f6, #2563eb); /* Slightly lighter bevel */
+  background: linear-gradient(145deg, #4ecdc4, #26a69a); /* Slightly lighter bevel */
 }
 
 .plus-icon {
@@ -413,12 +453,14 @@ export class DashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private taskService: TaskService,
-    private router: Router
+    private router: Router,
+    private taskReminderService: TaskReminderService
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.loadTasks();
+    this.taskReminderService.startReminderService();
   }
 
   get totalTasks(): number {
@@ -455,6 +497,10 @@ export class DashboardComponent implements OnInit {
 
   navigateToCreateTask(): void {
     this.router.navigate(['/create-task']);
+  }
+
+  editTask(taskId: number): void {
+    this.router.navigate(['/edit-task', taskId]);
   }
 
   markAsCompleted(taskId: number): void {

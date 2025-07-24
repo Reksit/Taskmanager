@@ -219,16 +219,42 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
       align-items: center;
       justify-content: center;
       padding: 20px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-container::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="30" r="0.5" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="4s" repeatCount="indefinite"/></circle><circle cx="40" cy="60" r="0.8" fill="white" opacity="0.7"><animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="70" cy="80" r="0.6" fill="white" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="3.5s" repeatCount="indefinite"/></circle><circle cx="10" cy="70" r="0.4" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/></circle><circle cx="90" cy="10" r="0.7" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.8s" repeatCount="indefinite"/></circle><circle cx="30" cy="90" r="0.5" fill="white" opacity="0.7"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3.2s" repeatCount="indefinite"/></circle><circle cx="60" cy="40" r="0.6" fill="white" opacity="0.5"><animate attributeName="opacity" values="0.5;0.3;0.5" dur="2.7s" repeatCount="indefinite"/></circle></svg>') repeat;
+      pointer-events: none;
+      z-index: 1;
+      animation: twinkle 10s linear infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
     }
 
     .auth-wrapper {
       width: 100%;
       max-width: 450px;
+      position: relative;
+      z-index: 10;
     }
 
     .auth-card {
       padding: 40px;
       text-align: center;
+      background: rgba(30, 30, 45, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .auth-header {
@@ -238,12 +264,12 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
     .auth-title {
       font-size: 28px;
       font-weight: 700;
-      color: #333;
+      color: #fff;
       margin-bottom: 8px;
     }
 
     .auth-subtitle {
-      color: #666;
+      color: #b0b0b0;
       font-size: 16px;
     }
 
@@ -252,7 +278,7 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
       margin-bottom: 30px;
       border-radius: 25px;
       overflow: hidden;
-      border: 2px solid #e1e5e9;
+      border: 2px solid rgba(255, 255, 255, 0.2);
     }
 
     .tab-button {
@@ -260,8 +286,8 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
 
       padding: 12px 20px;
       border: none;
-      background: white;
-      color: #666;
+      background: rgba(255, 255, 255, 0.1);
+      color: #b0b0b0;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -269,17 +295,17 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
     }
 
     .tab-button.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: linear-gradient(135deg, #64ffda 0%, #00bcd4 100%);
+      color: #1a1a2e;
     }
 
     .verification-info {
       text-align: center;
       margin-bottom: 30px;
       padding: 20px;
-      background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+      background: linear-gradient(135deg, rgba(100, 255, 218, 0.1) 0%, rgba(0, 188, 212, 0.1) 100%);
       border-radius: 25px;
-      border: 2px solid #e1e5e9;
+      border: 2px solid rgba(100, 255, 218, 0.2);
     }
 
     .verification-icon {
@@ -288,23 +314,23 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
     }
 
     .verification-info h3 {
-      color: #333;
+      color: #fff;
       margin-bottom: 10px;
       font-weight: 600;
       font-size: 24px;
     }
 
     .verification-info p {
-      color: #666;
+      color: #b0b0b0;
       margin-bottom: 8px;
       line-height: 1.5;
     }
 
     .email-highlight {
-      background: rgba(102, 126, 234, 0.1);
+      background: rgba(100, 255, 218, 0.2);
       padding: 8px 15px;
       border-radius: 15px;
-      color: #667eea !important;
+      color: #64ffda !important;
       font-weight: 600;
       margin: 10px 0;
     }
@@ -312,15 +338,15 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
     .verification-note {
       font-size: 14px;
       font-style: italic;
-      color: #555 !important;
+      color: #ccc !important;
     }
 
     .verification-sender {
       font-size: 12px;
-      color: #999 !important;
+      color: #888 !important;
       margin-top: 15px;
       padding-top: 10px;
-      border-top: 1px solid rgba(0,0,0,0.1);
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
 
     .verification-input {
@@ -335,11 +361,11 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
       text-align: center;
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid #e1e5e9;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .resend-text {
-      color: #666;
+      color: #b0b0b0;
       font-size: 14px;
       margin-bottom: 10px;
     }
@@ -347,7 +373,7 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
     .resend-btn {
       background: none;
       border: none;
-      color: #667eea;
+      color: #64ffda;
       font-weight: 600;
       cursor: pointer;
       text-decoration: underline;
@@ -360,7 +386,7 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
     }
 
     .resend-btn:disabled {
-      color: #999;
+      color: #666;
       cursor: not-allowed;
       text-decoration: none;
     }
@@ -381,7 +407,7 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: #333;
+      color: #fff;
     }
 
     .auth-btn {
@@ -406,7 +432,7 @@ import { LoginRequest, RegisterRequest, VerifyEmailRequest } from '../../models/
     }
 
     .password-hint {
-      color: #666;
+      color: #b0b0b0;
       font-size: 12px;
     }
 

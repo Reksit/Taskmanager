@@ -1,39 +1,38 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TaskService } from '../../services/task.service';
-import { CreateTaskRequest } from '../../models/task.model';
+import { Task } from '../../models/task.model';
 
 @Component({
-  selector: 'app-create-task',
+  selector: 'app-edit-task',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-<div class="create-task-container">
-  <nav class="navbar">
-    <div class="container">
-      <div class="nav-content">
-        <div class="nav-brand">TaskManager Pro</div>
-        <div class="nav-links">
-          <button class="btn btn-outline-primary back-btn" (click)="goBack()">
-            <span class="icon">←</span> Back to Dashboard
-          </button>
+    <div class="edit-task-container">
+      <nav class="navbar">
+        <div class="container">
+          <div class="nav-content">
+            <div class="nav-brand">TaskManager Pro</div>
+            <div class="nav-links">
+              <button class="btn btn-outline-primary back-btn" (click)="goBack()">
+                <span class="icon">←</span> Back to Dashboard
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </nav>
-
+      </nav>
 
       <div class="container">
-        <div class="create-task-wrapper">
-          <div class="create-task-card card">
+        <div class="edit-task-wrapper">
+          <div class="edit-task-card card">
             <div class="card-header">
-              <h1 class="card-title">Create New Task</h1>
-              <p class="card-subtitle">Fill in the details to create a new task</p>
+              <h1 class="card-title">Edit Task</h1>
+              <p class="card-subtitle">Update your task details</p>
             </div>
 
-            <form (ngSubmit)="onSubmit()" #taskForm="ngForm" class="task-form">
+            <form (ngSubmit)="onSubmit()" #taskForm="ngForm" class="task-form" *ngIf="taskData">
               <div class="form-group">
                 <label for="title">Task Title *</label>
                 <input
@@ -77,7 +76,6 @@ import { CreateTaskRequest } from '../../models/task.model';
                   name="priority"
                   required
                 >
-                  <option value="">Select Priority</option>
                   <option value="LOW">Low Priority</option>
                   <option value="MEDIUM">Medium Priority</option>
                   <option value="HIGH">High Priority</option>
@@ -94,7 +92,6 @@ import { CreateTaskRequest } from '../../models/task.model';
                   name="dueDate"
                   [min]="minDate"
                 />
-               
               </div>
 
               <div *ngIf="errorMessage" class="error-message">
@@ -120,39 +117,37 @@ import { CreateTaskRequest } from '../../models/task.model';
                   [disabled]="!taskForm.valid || isLoading"
                 >
                   <span *ngIf="isLoading" class="spinner"></span>
-                  {{ isLoading ? 'Creating...' : 'Create Task' }}
+                  {{ isLoading ? 'Updating...' : 'Update Task' }}
                 </button>
               </div>
             </form>
+
+            <div *ngIf="!taskData && !isLoading" class="error-message">
+              Task not found.
+            </div>
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .create-task-container {
+    .edit-task-container {
       min-height: 100vh;
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
       position: relative;
       overflow: hidden;
     }
 
-    .create-task-container::before {
+    .edit-task-container::before {
       content: '';
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="30" r="0.5" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="4s" repeatCount="indefinite"/></circle><circle cx="40" cy="60" r="0.8" fill="white" opacity="0.7"><animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="70" cy="80" r="0.6" fill="white" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="3.5s" repeatCount="indefinite"/></circle><circle cx="10" cy="70" r="0.4" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/></circle><circle cx="90" cy="10" r="0.7" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.8s" repeatCount="indefinite"/></circle><circle cx="30" cy="90" r="0.5" fill="white" opacity="0.7"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3.2s" repeatCount="indefinite"/></circle><circle cx="60" cy="40" r="0.6" fill="white" opacity="0.5"><animate attributeName="opacity" values="0.5;0.3;0.5" dur="2.7s" repeatCount="indefinite"/></circle></svg>') repeat;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="30" r="0.5" fill="white" opacity="0.6"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="4s" repeatCount="indefinite"/></circle><circle cx="40" cy="60" r="0.8" fill="white" opacity="0.7"><animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="70" cy="80" r="0.6" fill="white" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="3.5s" repeatCount="indefinite"/></circle><circle cx="10" cy="70" r="0.4" fill="white" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/></circle></svg>') repeat;
       pointer-events: none;
       z-index: 1;
-      animation: twinkle 10s linear infinite;
-    }
-
-    @keyframes twinkle {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
     }
 
     .navbar {
@@ -168,30 +163,36 @@ import { CreateTaskRequest } from '../../models/task.model';
       justify-content: space-between;
       align-items: center;
     }
+
+    .nav-brand {
+      font-size: 24px;
+      font-weight: 700;
+      color: #64ffda;
+    }
+
     .back-btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #64ffda;
-  border: 1px solid #64ffda;
-  border-radius: 4px;
-  background-color: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #64ffda;
+      border: 1px solid #64ffda;
+      border-radius: 4px;
+      background-color: transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-.back-btn:hover {
-  background-color: #64ffda;
-  color: #1a1a2e;
-}
+    .back-btn:hover {
+      background-color: #64ffda;
+      color: #1a1a2e;
+    }
 
-.back-btn .icon {
-  margin-right: 6px;
-  font-weight: bold;
-}
+    .back-btn .icon {
+      margin-right: 6px;
+      font-weight: bold;
+    }
 
-
-    .create-task-wrapper {
+    .edit-task-wrapper {
       padding: 30px 0;
       display: flex;
       justify-content: center;
@@ -199,7 +200,7 @@ import { CreateTaskRequest } from '../../models/task.model';
       z-index: 10;
     }
 
-    .create-task-card {
+    .edit-task-card {
       width: 100%;
       max-width: 600px;
       padding: 40px;
@@ -255,18 +256,14 @@ import { CreateTaskRequest } from '../../models/task.model';
       resize: vertical;
     }
 
-    .form-control::placeholder {
-      color: #888;
-    }
-
     .form-control:focus {
       outline: none;
       border-color: #64ffda;
       box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
     }
 
-    .form-control select {
-      cursor: pointer;
+    .form-control::placeholder {
+      color: #888;
     }
 
     .field-hint {
@@ -313,12 +310,12 @@ import { CreateTaskRequest } from '../../models/task.model';
     }
 
     .btn-secondary {
-      background: #ff6b6b;
+      background: #6c757d;
       color: white;
     }
 
     .btn-secondary:hover:not(:disabled) {
-      background: #ff5252;
+      background: #5a6268;
       transform: translateY(-2px);
     }
 
@@ -345,7 +342,7 @@ import { CreateTaskRequest } from '../../models/task.model';
     }
 
     @media (max-width: 768px) {
-      .create-task-card {
+      .edit-task-card {
         padding: 20px;
         margin: 0 15px;
       }
@@ -360,24 +357,28 @@ import { CreateTaskRequest } from '../../models/task.model';
     }
   `]
 })
-export class CreateTaskComponent {
-  taskData: CreateTaskRequest = {
-    title: '',
-    description: '',
-    priority: 'MEDIUM'
-  };
-
+export class EditTaskComponent implements OnInit {
+  taskData: Task | null = null;
   dueDateString = '';
   minDate = '';
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  taskId: number = 0;
 
   constructor(
     private taskService: TaskService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.setMinDate();
+  }
+
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.taskId = +params['id'];
+      this.loadTask();
+    });
   }
 
   private setMinDate(): void {
@@ -386,7 +387,28 @@ export class CreateTaskComponent {
     this.minDate = now.toISOString().slice(0, 16);
   }
 
+  loadTask(): void {
+    this.isLoading = true;
+    this.taskService.getTaskById(this.taskId).subscribe({
+      next: (task) => {
+        this.taskData = task;
+        if (task.dueDate) {
+          const dueDate = new Date(task.dueDate);
+          dueDate.setMinutes(dueDate.getMinutes() - dueDate.getTimezoneOffset());
+          this.dueDateString = dueDate.toISOString().slice(0, 16);
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = 'Failed to load task. Please try again.';
+      }
+    });
+  }
+
   onSubmit(): void {
+    if (!this.taskData) return;
+
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -394,12 +416,14 @@ export class CreateTaskComponent {
     // Convert date string to Date object if provided
     if (this.dueDateString) {
       this.taskData.dueDate = new Date(this.dueDateString);
+    } else {
+      this.taskData.dueDate = undefined;
     }
 
-    this.taskService.createTask(this.taskData).subscribe({
+    this.taskService.updateTask(this.taskId, this.taskData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.successMessage = 'Task created successfully!';
+        this.successMessage = 'Task updated successfully!';
         
         // Navigate back to dashboard after short delay
         setTimeout(() => {
@@ -408,7 +432,7 @@ export class CreateTaskComponent {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Failed to create task. Please try again.';
+        this.errorMessage = error.error?.message || 'Failed to update task. Please try again.';
       }
     });
   }

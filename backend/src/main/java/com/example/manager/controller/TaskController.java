@@ -3,12 +3,14 @@ package com.example.manager.controller;
 import com.example.manager.dto.TaskRequest;
 import com.example.manager.dto.TaskResponse;
 import com.example.manager.service.TaskService;
+import com.example.manager.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -17,6 +19,9 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping
     public ResponseEntity<List<TaskResponse>> getAllTasks() {
@@ -89,6 +94,22 @@ public class TaskController {
             return ResponseEntity.ok(updatedTask);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/send-reminder")
+    public ResponseEntity<?> sendTaskReminder(@RequestBody Map<String, Object> reminderData) {
+        try {
+            Long taskId = Long.valueOf(reminderData.get("taskId").toString());
+            String taskTitle = reminderData.get("taskTitle").toString();
+            String taskDescription = reminderData.get("taskDescription").toString();
+            String dueDate = reminderData.get("dueDate").toString();
+            Integer hoursUntilDue = Integer.valueOf(reminderData.get("hoursUntilDue").toString());
+            
+            emailService.sendTaskReminder(taskTitle, taskDescription, dueDate, hoursUntilDue);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

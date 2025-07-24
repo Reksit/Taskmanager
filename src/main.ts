@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { AuthComponent } from './components/auth/auth.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { CreateTaskComponent } from './components/create-task/create-task.component';
+import { EditTaskComponent } from './components/edit-task/edit-task.component';
 import { httpErrorInterceptor } from './interceptors/http-error.interceptor';
 
 @Component({
@@ -28,6 +29,7 @@ const routes: Routes = [
   { path: 'auth', component: AuthComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'create-task', component: CreateTaskComponent },
+  { path: 'edit-task/:id', component: EditTaskComponent },
   { path: '**', redirectTo: '/auth' }
 ];
 
